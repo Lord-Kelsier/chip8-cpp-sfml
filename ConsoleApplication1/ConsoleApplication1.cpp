@@ -8,13 +8,10 @@ bool getRandBinColor() {
     return (bool)var;
 
 }
-int main() {
-    // Create the main window
-    sf::RenderWindow window(sf::VideoMode(1280, 640), "SFML Moving Cubes");
+void setupGraphics(sf::RectangleShape* cubes) {
+    
     float cubeSize = 20.0f;
     // Set the frame rate
-    window.setFramerateLimit(60);
-    sf::RectangleShape cubes[64*32];
     if (cubes == NULL) exit(1);
     for (int i = 0; i < 64 * 32; i++) {
         // Define two white cubes
@@ -27,9 +24,19 @@ int main() {
         }
         cubes[i].setPosition((i % 64) * cubeSize, (i / 64) * cubeSize);
     }
-    
-
-
+}
+int main() {
+    // Create the main window
+    sf::RectangleShape cubes[64 * 32];
+    sf::RenderWindow window(sf::VideoMode(1280, 640), "SFML Moving Cubes");
+    window.setFramerateLimit(60);
+    setupGraphics(cubes);
+    CPU cpu;
+    cpu.initialize();
+    cpu.loadGame("pong");
+    int iters = 0;
+    time_t start, end;
+    time(&start);
     // Start the game loop
     while (window.isOpen()) {
         // Process events
@@ -39,14 +46,25 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        // Clear screen
-        window.clear(sf::Color::Black);
-        // Draw the cubes
-        for (int i = 0; i < 64 * 32; i++) {
-            window.draw(cubes[i]);
+        // Emulate one cycle
+        cpu.emulateCycle();
+        // If the draw flag is set, update screen
+        if (cpu.drawFlag || true) {
+            // Clear screen
+            window.clear(sf::Color::Black);
+            // Draw the cubes
+            for (int i = 0; i < 64 * 32; i++) {
+                window.draw(cubes[i]);
+            }
+            
         }
+        // store key press state (Press and Release)
+        cpu.setKeys();
         // Update the window
         window.display();
+        time(&end);
+        iters++;
+        std::cout << iters << "|" << end-start <<std::endl;
     }
     cubes;
     return 0;
