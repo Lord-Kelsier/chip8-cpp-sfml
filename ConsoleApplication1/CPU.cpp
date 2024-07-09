@@ -347,30 +347,40 @@ void CPU::saveDebugInfo(std::string name) {
     std::ofstream file(name);
     file << "V, Registers:" << std::endl;
     for (int i = 0; i < 16; i++) {
-        file << std::hex << V[i] << std::endl;
+        file << std::hex << (unsigned short)V[i] << " ";
     }
+    file << std::endl;
     file << "PC: " << pc << std::endl;
     file << "Clear screen Flag: " << clearScreenFlag << std::endl;
     file << "Draw Flag: " << drawFlag<< std::endl;
     file << "gfx:" << std::endl;
     for (int i = 0; i < 64 * 32; i++) {
-        file << std::hex << gfx[i] << std::endl;
+        if (i % 64 == 0 && i != 0) {
+            file << std::endl;
+        }
+        file << std::hex << (unsigned short)gfx[i] << " ";
     }
+    file << std::endl;
     file << "I: " << I << std::endl;
-    file << "Delay Timer: " << delay_timer << std::endl;
-    file << "sound Timer: " << sound_timer<< std::endl;
+    file << "Delay Timer: " << std::hex << (unsigned short)delay_timer << std::endl;
+    file << "sound Timer: " << std::hex << (unsigned short)sound_timer<< std::endl;
     file << "sp: " << sp << std::endl;
     file << "Stack: " << std::endl;
     for (int i = 0; i < 16; i++) {
-        file << std::hex << stack[i] << std::endl;
+        file << std::hex << (unsigned short)stack[i] << " ";
     }
+    file << std::endl;
     file << "Keys: " << std::endl;
     for (int i = 0; i < 16; i++) {
-        file << std::hex << key[i] << std::endl;
+        file << std::hex << (unsigned short)key[i] << " ";
     }
+    file << std::endl;
     file << "Mem:" << std::endl;
     for (int i = 0x200; i < 4096; i++) {
-        file << std::hex << memory[i] << std::endl;
+        if ((i - 0x200) % 64 == 0 && i != 0x200) {
+            file << std::endl;
+        }
+        file << std::hex << (unsigned short)memory[i] << " ";
     }
 
 
