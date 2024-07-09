@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstdlib>
+#include "CPU.h"
 
 bool getRandBinColor() {
     int var = rand() / (RAND_MAX / 2) - 1;
