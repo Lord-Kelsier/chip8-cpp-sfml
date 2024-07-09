@@ -71,6 +71,7 @@ int main() {
     //time_t start, end;
     //time(&start);
     // Start the game loop
+    int iterations = 0;
     while (window.isOpen()) {
         // Process events
         sf::Event event;
@@ -106,8 +107,12 @@ int main() {
         if (cpu.sound_timer != 0) {
             std::cout << "SOUND PLAYING" << std::endl;
         }
+        if (iterations == 10) {
+            cpu.saveDebugInfo("Debug.txt");
+        }
         // Update the window
         window.display();
+        iterations++;
         //time(&end);
         //iters++;
         //std::cout <<"iters" << iters << "|" << end - start << std::endl;

@@ -34,6 +34,7 @@ public:
     void initialize(); // Clear the memory, registers and screen
     void loadGame(std::string game); // Copy the program into the memory
     void emulateCycle(); // Emulate one cycle of the system
+    void saveDebugInfo(std::string name);
 private:
     void decodeOpcode(unsigned short first, unsigned short second, unsigned short third, unsigned short fourth);
     void returnSubroutine();
