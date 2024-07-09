@@ -321,7 +321,11 @@ void CPU::emulateCycle() {
     clearScreenFlag = false;
     drawFlag = false;
     opcode = memory[pc] << 8 | memory[pc + 1];
-    std::cout << "Exec opcode: " << std::hex << opcode << std::endl;
+    std::ofstream file;
+    file.open("opcodes.log", std::ios_base::app);
+    file << "Exec opcode: " << std::hex << opcode << " ";
+    file << "PC: " << std::hex << pc << std::endl;
+    file.close();
     unsigned short int
         firstHalfByte,
         secodnHalfByte,

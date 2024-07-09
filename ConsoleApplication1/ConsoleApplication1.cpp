@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 #include "CPU.h"
 
 bool getRandBinColor() {
@@ -66,6 +67,8 @@ int main() {
     cpu.initialize();
     //cpu.loadGame("GAMES/INVADERS");
     cpu.loadGame("DEBUGGAME");
+    std::ofstream file("opcodes.log");
+    file.close();
     int iters = 0;
     sf::Color black = sf::Color::Black;
     sf::Color white = sf::Color::White;
