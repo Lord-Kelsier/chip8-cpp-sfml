@@ -34,7 +34,6 @@ public:
     void initialize(); // Clear the memory, registers and screen
     void loadGame(std::string game); // Copy the program into the memory
     void emulateCycle(); // Emulate one cycle of the system
-    void setKeys(); // If we press or release a key, we should store this state in the part that emulates the keypad
 private:
     void decodeOpcode(unsigned short first, unsigned short second, unsigned short third, unsigned short fourth);
     void returnSubroutine();

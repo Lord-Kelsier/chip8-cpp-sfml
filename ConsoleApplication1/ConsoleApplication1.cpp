@@ -25,6 +25,37 @@ void setupGraphics(sf::RectangleShape* cubes) {
         cubes[i].setPosition((i % 64) * cubeSize, (i / 64) * cubeSize);
     }
 }
+
+void checkKeys(CPU* cpu) {
+    sf::Keyboard::Key keys[16] = {
+        sf::Keyboard::Num1,
+        sf::Keyboard::Num2,
+        sf::Keyboard::Num3,
+        sf::Keyboard::Q,
+        sf::Keyboard::W,
+        sf::Keyboard::E,
+        sf::Keyboard::A,
+        sf::Keyboard::S,
+        sf::Keyboard::D,
+        sf::Keyboard::X,
+        sf::Keyboard::Z,
+        sf::Keyboard::C,
+        sf::Keyboard::Num4,
+        sf::Keyboard::R,
+        sf::Keyboard::F,
+        sf::Keyboard::V,
+
+    };
+    for (int i = 0; i < 16; i++) {
+        if (sf::Keyboard::isKeyPressed(keys[i])) {
+            cpu->key[i] = 1;
+            std::cout << "Pressed: " << keys[i] << std::endl;
+        }
+        else {
+            cpu->key[i] = 0;
+        }
+    }
+}
 int main() {
     // Create the main window
     sf::RectangleShape cubes[64 * 32];
@@ -70,7 +101,11 @@ int main() {
             window.clear(black);
         }
         // store key press state (Press and Release)
-        cpu.setKeys();
+        checkKeys(&cpu);
+        // sound
+        if (cpu.sound_timer != 0) {
+            std::cout << "SOUND PLAYING" << std::endl;
+        }
         // Update the window
         window.display();
         //time(&end);

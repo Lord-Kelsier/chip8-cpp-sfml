@@ -87,12 +87,12 @@ void CPU::ifJump(unsigned short value1, unsigned short value2, IfCond conditiona
     {
     case equ:
         if (value1 == value2) {
-            pc += 4;
+            pc += 2;
         }
         break;
     case neq:
         if (value1 != value2) {
-            pc += 4;
+            pc += 2;
         }
         break;
     default:
@@ -214,9 +214,17 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
     else if (first == 0xE) {
         if (third == 0x9 && fourth == 0xE) {
             // Skips the next instruction if the key stored in VX is pressed (usually the next instruction is a jump to skip a code block).[22]
+            unsigned char keyCheck = key[V[second]];
+            if (keyCheck != 0) {
+                pc += 2;
+            }
         }
         else if (third == 0xA && fourth == 0x1) {
             //Skips the next instruction if the key stored in VX is not pressed (usually the next instruction is a jump to skip a code block).[22]
+            unsigned char keyCheck = key[V[second]];
+            if (keyCheck == 0) {
+                pc += 2;
+            }
         }
     }
     else if (first == 0xF) {
@@ -266,10 +274,6 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
             }
         }
     }
-    return;
-}
-
-void CPU::setKeys() {
     return;
 }
 
