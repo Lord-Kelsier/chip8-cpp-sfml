@@ -64,6 +64,7 @@ int main() {
     setupGraphics(cubes);
     CPU cpu;
     cpu.initialize();
+    //cpu.loadGame("GAMES/INVADERS");
     cpu.loadGame("DEBUGGAME");
     int iters = 0;
     sf::Color black = sf::Color::Black;

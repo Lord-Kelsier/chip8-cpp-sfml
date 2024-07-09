@@ -71,17 +71,17 @@ unsigned short int groupTwo(unsigned short first, unsigned short second) {
 void CPU::returnSubroutine() {
     sp--;
     unsigned short int pointer = stack[sp];
-    pc = pointer;
+    pc = pointer - 2; // compensar el +2 al pc que se hace siempre
 }
 
 void CPU::gotoDir(unsigned short direction) {
-    pc = direction;
+    pc = direction - 2; // compensar el +2 al pc que se hace siempre
 }
 
 void CPU::callSubRoutine(unsigned short direction) {
     stack[sp] = pc;
     sp++;
-    pc = direction;
+    pc = direction - 2; // compensar el +2 al pc que se hace siempre
 }
 
 void CPU::ifJump(unsigned short value1, unsigned short value2, IfCond conditional) {
@@ -202,7 +202,7 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
     }
     else if (first == 0xB) {
         unsigned short remainder = groupThree(second, third, fourth);
-        pc = V[0x0] + remainder;
+        pc = V[0x0] + remainder - 2;
     }
     else if (first == 0xC) {
         unsigned short remainder = groupTwo(third, fourth);
