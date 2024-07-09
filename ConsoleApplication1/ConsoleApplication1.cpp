@@ -51,9 +51,9 @@ int main() {
         // Emulate one cycle
         cpu.emulateCycle();
         // If the draw flag is set, update screen
-        if (cpu.drawFlag || true) {
+        if (cpu.drawFlag) {
             // Clear screen
-            window.clear(sf::Color::Black);
+            //window.clear(black);
             // Draw the cubes
             int offset = 0;
             for (int byteIndex = 0; byteIndex < 64 * 32; byteIndex++) {
@@ -65,6 +65,9 @@ int main() {
                 }
                 window.draw(cubes[byteIndex]);
             }
+        }
+        if (cpu.clearScreenFlag) {
+            window.clear(black);
         }
         // store key press state (Press and Release)
         cpu.setKeys();

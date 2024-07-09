@@ -16,7 +16,7 @@ public:
     */
     unsigned char V[16]; // 15 1 byte resgisters
     unsigned short I;
-    int counter;
+    bool clearScreenFlag;
     unsigned short pc; // program counter
     unsigned char gfx[64 * 32]; // screen 
     unsigned char delay_timer;
@@ -31,7 +31,6 @@ public:
         0x00E0 – Clears the screen
         0xDXYN – Draws a sprite on the screen*/
 public:
-    void drawSprite();
     void initialize(); // Clear the memory, registers and screen
     void loadGame(std::string game); // Copy the program into the memory
     void emulateCycle(); // Emulate one cycle of the system
@@ -42,4 +41,5 @@ private:
     void gotoDir(unsigned short direction);
     void callSubRoutine(unsigned short direction);
     void ifJump(unsigned short value1, unsigned short value2, IfCond conditional);
+    void drawSprite(unsigned short x, unsigned short y, unsigned short N);
 };

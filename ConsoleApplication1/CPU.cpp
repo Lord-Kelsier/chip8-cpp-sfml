@@ -28,22 +28,14 @@ const int CHIP8_FONT_SET[80] = {
     0xf0, 0x80, 0xf0, 0x80, 0x80
 };
 
-void CPU::drawSprite() {
-    /*The graphics system:
-    The chip 8 has one instruction that draws sprite to
-    the screen. Drawing is done in XOR mode and if a pixel
-    is turned off as a result of drawing, the VF register is
-    set. This is used for collision detection*/
-    return;
-
-}
-
 void CPU::initialize() {
     // initialize register and memory once
     pc = 0x200;
     opcode = 0;
     I = 0;
     sp = 0;
+    clearScreenFlag = false;
+    drawFlag = false;
     for (int i = 0; i < 16; i++) {
         V[i] = 0;
         stack[i] = 0;
@@ -54,16 +46,15 @@ void CPU::initialize() {
     for (int i = 0; i < 64 * 32; i++) {
         gfx[i] = 0;
     }
+    // Load fontset
     for (int i = 0; i < 80; ++i)
         memory[i] = CHIP8_FONT_SET[i];
     /*// Clear display
 
-    // Load fontset
 
     // Reset timers*/
     delay_timer = 0;
     sound_timer = 0;
-    counter = 0;
     return;
 }
 
@@ -114,13 +105,14 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
     if (first == 0x0) {
         unsigned short remainder = groupThree(second, third, fourth);
         if (remainder == 0x0E0) {
-            // clearScreen()
+            clearScreenFlag = true;
         }
         else if (remainder == 0x0EE) {
             returnSubroutine();
         }
         else {
             // Calls machine code routine (RCA 1802 for COSMAC VIP) at address NNN. Not necessary for most ROMs.[22]
+            std::cout << "deprecated 0NNN code executed" << std::endl;
         }
     }
     else if (first == 0x1) {
@@ -217,6 +209,7 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
     }
     else if (first == 0xD) {
         // Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen.[22]
+        drawSprite(V[second], V[third], fourth);
     }
     else if (first == 0xE) {
         if (third == 0x9 && fourth == 0xE) {
@@ -245,15 +238,32 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
         }
         else if (lastTwo == 0x29) {
             // Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.[22]
+            unsigned short value = V[second];
+            I = value * 5;
         }
         else if (lastTwo == 0x33) {
             // Stores the binary-coded decimal representation of VX, with the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.[22]
+            unsigned short value = V[second];
+            unsigned char hund = value / 100;
+            value %= 100;
+            unsigned char dec = value / 10;
+            value %= 10;
+            unsigned char uni = value;
+            memory[I] = hund;
+            memory[I + 1] = dec;
+            memory[I + 2] = uni;
         }
         else if (lastTwo == 0x55) {
             // Stores from V0 to VX (including VX) in memory, starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.[d][22]
+            for (int i = 0; i < 0x10; i++) {
+                memory[I + i] = V[i];
+            }
         }
         else if (lastTwo == 0x65) {
             // Fills from V0 to VX (including VX) with values from memory, starting at address I. The offset from I is increased by 1 for each value read, but I itself is left unmodified.[d][22]
+            for (int i = 0; i < 0x10; i++) {
+                V[i] = memory[I + i];
+            }
         }
     }
     return;
@@ -266,36 +276,49 @@ void CPU::setKeys() {
 void CPU::loadGame(std::string game) {
     return;
 }
+void CPU::drawSprite(unsigned short x, unsigned short y, unsigned short N) {
+    drawFlag = true;
+    int startPos = y * 64 + x;
+    V[0xF] = 0;
+    for (int row = 0; row < N; row++) {
+        unsigned char byte = memory[I + row];
+        for (int bitPos = 0; bitPos < 8; bitPos++) {
+            unsigned short offset = 0x80 >> bitPos;
+            if ((byte & offset) != 0) {
+                unsigned short newPos = startPos + bitPos + (row * 64);
+                if (gfx[newPos] == 1) {
+                    V[0xF] = 1;
+                }
+                gfx[newPos] ^= 1;
+            }
+        }
+    }
+}
 
 void CPU::emulateCycle() {
-    //// Fetch Opcode
-    //opcode = memory[pc] << 8 | memory[pc + 1];
-    //opcode = 0x1AF0;
-    //unsigned short int
-    //    firstHalfByte,
-    //    secodnHalfByte,
-    //    thirdHalfByte,
-    //    fourthHalfByte;
-    //firstHalfByte = opcode >> 12;
-    //secodnHalfByte = (opcode & 0x0F00) >> 8;
-    //thirdHalfByte = (opcode & 0x00F0) >> 4;
-    //fourthHalfByte = opcode & 0x000F;
-    //decodeOpcode(firstHalfByte, secodnHalfByte, thirdHalfByte, fourthHalfByte);
-    //// Update timers
-    //if (delay_timer > 0) {
-    //    delay_timer--;
-    //}
-    //if (sound_timer > 0) {
-    //    sound_timer--;
-    //}
-    gfx[counter] = 1;
-    counter = (counter + 1) % (64 * 32);
-    /*if (counter != 0) {
-        gfx[counter - 1] = 0;
+    // Fetch Opcode
+    clearScreenFlag = false;
+    drawFlag = false;
+    opcode = memory[pc] << 8 | memory[pc + 1];
+    opcode = 0x1AF0;
+    unsigned short int
+        firstHalfByte,
+        secodnHalfByte,
+        thirdHalfByte,
+        fourthHalfByte;
+    firstHalfByte = opcode >> 12;
+    secodnHalfByte = (opcode & 0x0F00) >> 8;
+    thirdHalfByte = (opcode & 0x00F0) >> 4;
+    fourthHalfByte = opcode & 0x000F;
+    decodeOpcode(firstHalfByte, secodnHalfByte, thirdHalfByte, fourthHalfByte);
+    pc += 2;
+    // Update timers
+    if (delay_timer > 0) {
+        delay_timer--;
     }
-    else {
-        gfx[64 * 32 / 8 - 1] = 0;
-    }*/
+    if (sound_timer > 0) {
+        sound_timer--;
+    }
     return;
 }
 
