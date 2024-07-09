@@ -51,7 +51,7 @@ void CPU::initialize() {
     for (int i = 0; i < 4096; i++) {
         memory[i] = 0;
     }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < 64 * 32; i++) {
         gfx[i] = 0;
     }
     for (int i = 0; i < 80; ++i)
@@ -63,8 +63,8 @@ void CPU::initialize() {
     // Reset timers*/
     delay_timer = 0;
     sound_timer = 0;
+    counter = 0;
     return;
-
 }
 
 unsigned short int groupThree(unsigned short first, unsigned short second, unsigned short third) {
@@ -268,26 +268,34 @@ void CPU::loadGame(std::string game) {
 }
 
 void CPU::emulateCycle() {
-    // Fetch Opcode
-    opcode = memory[pc] << 8 | memory[pc + 1];
-    opcode = 0x1AF0;
-    unsigned short int
-        firstHalfByte,
-        secodnHalfByte,
-        thirdHalfByte,
-        fourthHalfByte;
-    firstHalfByte = opcode >> 12;
-    secodnHalfByte = (opcode & 0x0F00) >> 8;
-    thirdHalfByte = (opcode & 0x00F0) >> 4;
-    fourthHalfByte = opcode & 0x000F;
-    decodeOpcode(firstHalfByte, secodnHalfByte, thirdHalfByte, fourthHalfByte);
-    // Update timers
-    if (delay_timer > 0) {
-        delay_timer--;
+    //// Fetch Opcode
+    //opcode = memory[pc] << 8 | memory[pc + 1];
+    //opcode = 0x1AF0;
+    //unsigned short int
+    //    firstHalfByte,
+    //    secodnHalfByte,
+    //    thirdHalfByte,
+    //    fourthHalfByte;
+    //firstHalfByte = opcode >> 12;
+    //secodnHalfByte = (opcode & 0x0F00) >> 8;
+    //thirdHalfByte = (opcode & 0x00F0) >> 4;
+    //fourthHalfByte = opcode & 0x000F;
+    //decodeOpcode(firstHalfByte, secodnHalfByte, thirdHalfByte, fourthHalfByte);
+    //// Update timers
+    //if (delay_timer > 0) {
+    //    delay_timer--;
+    //}
+    //if (sound_timer > 0) {
+    //    sound_timer--;
+    //}
+    gfx[counter] = 1;
+    counter = (counter + 1) % (64 * 32);
+    /*if (counter != 0) {
+        gfx[counter - 1] = 0;
     }
-    if (sound_timer > 0) {
-        sound_timer--;
-    }
+    else {
+        gfx[64 * 32 / 8 - 1] = 0;
+    }*/
     return;
 }
 

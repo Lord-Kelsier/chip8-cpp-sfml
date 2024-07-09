@@ -35,8 +35,10 @@ int main() {
     cpu.initialize();
     cpu.loadGame("pong");
     int iters = 0;
-    time_t start, end;
-    time(&start);
+    sf::Color black = sf::Color::Black;
+    sf::Color white = sf::Color::White;
+    //time_t start, end;
+    //time(&start);
     // Start the game loop
     while (window.isOpen()) {
         // Process events
@@ -53,18 +55,24 @@ int main() {
             // Clear screen
             window.clear(sf::Color::Black);
             // Draw the cubes
-            for (int i = 0; i < 64 * 32; i++) {
-                window.draw(cubes[i]);
+            int offset = 0;
+            for (int byteIndex = 0; byteIndex < 64 * 32; byteIndex++) {
+                if (cpu.gfx[byteIndex]) {
+                    cubes[byteIndex].setFillColor(white);
+                }
+                else {
+                    cubes[byteIndex].setFillColor(black);
+                }
+                window.draw(cubes[byteIndex]);
             }
-            
         }
         // store key press state (Press and Release)
         cpu.setKeys();
         // Update the window
         window.display();
-        time(&end);
-        iters++;
-        std::cout << iters << "|" << end-start <<std::endl;
+        //time(&end);
+        //iters++;
+        //std::cout <<"iters" << iters << "|" << end - start << std::endl;
     }
     cubes;
     return 0;

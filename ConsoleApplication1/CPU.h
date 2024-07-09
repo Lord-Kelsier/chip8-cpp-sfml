@@ -16,8 +16,9 @@ public:
     */
     unsigned char V[16]; // 15 1 byte resgisters
     unsigned short I;
+    int counter;
     unsigned short pc; // program counter
-    unsigned char gfx[64 * 32 / 8]; // screen 
+    unsigned char gfx[64 * 32]; // screen 
     unsigned char delay_timer;
     unsigned char sound_timer;
     /*timers que cuentan a 60 Hz, cuando estan por encima de 0
