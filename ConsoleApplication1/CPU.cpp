@@ -1,6 +1,8 @@
 #include "CPU.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <vector>
 
 const int CHIP8_FONT_SET[80] = {
     0xf0, 0x90, 0x90, 0x90, 0xf0,
@@ -99,7 +101,6 @@ void CPU::ifJump(unsigned short value1, unsigned short value2, IfCond conditiona
         break;
     }
 }
-
 
 void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned short third, unsigned short fourth) {
     if (first == 0x0) {
@@ -278,6 +279,22 @@ void CPU::decodeOpcode(unsigned short first, unsigned short second, unsigned sho
 }
 
 void CPU::loadGame(std::string game) {
+    std::ifstream file(game, std::ios::binary);
+    if (!file) {
+        std::cerr << "Unable to open file.\n";
+        exit(1);
+    }
+    // Read the file byte by byte and store each byte in a vector
+    std::vector<unsigned char> byteArray;
+    unsigned char byte;
+    int offset = 0x200;
+    while (file.get(reinterpret_cast<char&>(byte))) {
+        std::cout << "Load to: " << offset << std::endl;
+        memory[offset] = byte;
+        offset++;
+    }
+    std::cout << "End Loading" << std::endl;
+    file.close();
     return;
 }
 void CPU::drawSprite(unsigned short x, unsigned short y, unsigned short N) {
@@ -304,7 +321,7 @@ void CPU::emulateCycle() {
     clearScreenFlag = false;
     drawFlag = false;
     opcode = memory[pc] << 8 | memory[pc + 1];
-    opcode = 0x1AF0;
+    std::cout << "Exec opcode: " << std::hex << opcode << std::endl;
     unsigned short int
         firstHalfByte,
         secodnHalfByte,

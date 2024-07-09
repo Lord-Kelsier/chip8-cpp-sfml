@@ -64,7 +64,7 @@ int main() {
     setupGraphics(cubes);
     CPU cpu;
     cpu.initialize();
-    cpu.loadGame("pong");
+    cpu.loadGame("GAMES/TETRIS");
     int iters = 0;
     sf::Color black = sf::Color::Black;
     sf::Color white = sf::Color::White;
